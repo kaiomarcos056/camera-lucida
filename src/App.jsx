@@ -1,96 +1,3 @@
-// import { useEffect, useRef, useState } from 'react';
-
-// function App() {
-//   const videoRef = useRef(null);
-//   const [imageSrc, setImageSrc] = useState('/reference.png');
-//   const [opacity, setOpacity] = useState(0.5);
-
-//   const [imageHeight, setImageHeight] = useState(100); // altura em %
-
-//   useEffect(() => {
-//     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-//       .then(stream => {
-//         if (videoRef.current) {
-//           videoRef.current.srcObject = stream;
-//           videoRef.current.play();
-//         }
-//       })
-//       .catch(err => {
-//         alert('Erro ao acessar a câmera: ' + err.message);
-//       });
-//   }, []);
-
-//   const handleImageChange = (e) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
-//     const url = URL.createObjectURL(file);
-//     setImageSrc(url);
-//   };
-
-//   return (
-//     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-//       <video
-//         ref={videoRef}
-//         autoPlay
-//         muted
-//         playsInline
-//         style={{
-//           position: 'absolute',
-//           top: 0,
-//           left: 0,
-//           width: '100%',
-//           height: '100%',
-//           objectFit: 'cover'
-//         }}
-//       />
-//       <img
-//         src={imageSrc}
-//         alt="Referência"
-//         style={{
-//           position: 'absolute',
-//           top: 0,
-//           left: 0,
-//           width: '100%',
-//           height: `${imageHeight}%`,
-//           objectFit: 'contain',
-//           opacity: opacity
-//         }}
-//       />
-//       <div style={{ position: 'absolute', bottom: 20, left: 20, background: '#000000aa', padding: 10, borderRadius: 8 }}>
-//         <input type="file" accept="image/*" onChange={handleImageChange} />
-//         <br />
-//         <label style={{ color: 'white' }}>
-//           Opacidade: {opacity.toFixed(2)}
-//           <input
-//             type="range"
-//             min="0"
-//             max="1"
-//             step="0.01"
-//             value={opacity}
-//             onChange={(e) => setOpacity(parseFloat(e.target.value))}
-//             style={{ width: '100%' }}
-//           />
-//         </label>
-//         <br/>
-//         <label style={{ color: 'white' }}>
-//   Altura: {imageHeight}%
-//   <input
-//     type="range"
-//     min="10"
-//     max="200"
-//     step="1"
-//     value={imageHeight}
-//     onChange={(e) => setImageHeight(parseInt(e.target.value))}
-//     style={{ width: '100%' }}
-//   />
-// </label>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
-
 import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 
@@ -110,8 +17,16 @@ const [isFlipped, setIsFlipped] = useState(false);
   const [zoomSupported, setZoomSupported] = useState(false);
   const [zoomRange, setZoomRange] = useState({ min: 1, max: 1 });
   const videoTrackRef = useRef(null);
+  const [showMenu, setShowMenu] = useState(window.innerWidth > 768);
+const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  const [stageSize, setStageSize] = useState({
+  width: window.innerWidth,
+  height: window.innerHeight,
+});
 
   const handleImageChange = (e) => {
+
     const file = e.target.files[0];
     if (!file) return;
 
@@ -125,6 +40,8 @@ const [isFlipped, setIsFlipped] = useState(false);
   };
 
   const handleZoomChange = async (e) => {
+    
+
     const newZoom = parseFloat(e.target.value);
     setCameraZoom(newZoom);
 
@@ -159,6 +76,50 @@ const [isFlipped, setIsFlipped] = useState(false);
       });
   }, []);
 
+  useEffect(() => {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then((stream) => {
+      const [track] = stream.getVideoTracks();
+      videoTrackRef.current = track;
+
+      const capabilities = track.getCapabilities?.();
+      if (capabilities && capabilities.zoom) {
+        setZoomSupported(true);
+        setZoomRange({ min: capabilities.zoom.min, max: capabilities.zoom.max });
+        setCameraZoom(track.getSettings().zoom || capabilities.zoom.min);
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    })
+    .catch((err) => {
+      alert('Erro ao acessar a câmera: ' + err.message);
+    });
+}, []);
+
+useEffect(() => {
+  const handleResize = () => {
+    const isNowMobile = window.innerWidth <= 768;
+    setIsMobile(isNowMobile);
+    setStageSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+
+    // Opcional: fecha o menu se virou mobile
+    if (isNowMobile) {
+      setShowMenu(false);
+    } else {
+      setShowMenu(true);
+    }
+  };
+
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
       <video
@@ -177,9 +138,7 @@ const [isFlipped, setIsFlipped] = useState(false);
         }}
       />
 
-      <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
+      <Stage width={stageSize.width -10} height={stageSize.height - 10}
         style={{ position: 'absolute', top: 0, left: 0, zIndex: 2 }}
         onMouseDown={(e) => {
           // desmarca ao clicar fora
@@ -222,6 +181,9 @@ const [isFlipped, setIsFlipped] = useState(false);
           )}
         </Layer>
       </Stage>
+
+
+{(showMenu || !isMobile) && (
 
       <div style={{
         position: 'absolute',
@@ -282,6 +244,33 @@ const [isFlipped, setIsFlipped] = useState(false);
           {isFlipped ? 'Desespelhar imagem' : 'Espelhar imagem'}
         </button>
       </div>
+
+)}
+
+      {isMobile && (
+  <button
+    onClick={() => setShowMenu((prev) => !prev)}
+    style={{
+      position: 'absolute',
+      // bottom: 20,
+      // right: 20,
+      zIndex: 4,
+      background: '#000000dd',
+      color: 'white',
+      border: 'none',
+      borderRadius: '50%',
+      width: 50,
+      height: 50,
+      fontSize: 24,
+      cursor: 'pointer'
+    }}
+    title={showMenu ? 'Fechar menu' : 'Abrir menu'}
+  >
+    {showMenu ? '✖' : '☰'}
+  </button>
+)}
+
+
     </div>
   );
 }

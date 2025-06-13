@@ -1,0 +1,60 @@
+button:focus {
+  outline: none;
+}
+
+label{
+    font-weight: bold;
+}
+
+.buttonMenu{
+    position: absolute;
+    z-index: 4;
+    background-color: #276efe;
+    margin: 10px;
+    color: white;
+    padding: 5px 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+.buttonMenu.close{
+    background-color: white;
+    color: #276efe;
+}
+
+.buttonEspelhar{
+    margin-top: 10px;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background-color: #276efe;
+    color: white;
+}
+
+.buttonEspelhar:hover{
+    background-color: white;
+    color: #276efe;
+}
+
+.containerMenu{
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px 10px;
+    border-radius: 8px;
+    z-index: 3;
+    color: white;
+    width: 300px;
+}
+
+.container{
+    position: relative; 
+    width: 100vw; 
+    height: calc(100vh - 64px); 
+    overflow: hidden;
+}

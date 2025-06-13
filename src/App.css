@@ -1,10 +1,10 @@
-button:focus {
-  outline: none;
-}
+    /* button:focus {
+    outline: none;
+    }
 
-label{
-    font-weight: bold;
-}
+    label{
+        font-weight: bold;
+    } */
 
 .buttonMenu{
     position: absolute;
@@ -40,16 +40,34 @@ label{
     color: #276efe;
 }
 
+.buttonImagem {
+    text-align: center;
+    background-color: #276efe;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.buttonImagem:hover {
+    background-color: white;
+    color: #276efe;
+}
+
 .containerMenu{
     position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.5);
+    top: 60px;
+    left: 10px;
+    background: rgba(60, 45, 45, 0.5);
     padding: 15px 10px;
     border-radius: 8px;
     z-index: 3;
     color: white;
     width: 300px;
+    display: flex;
+    flex-direction: column;
 }
 
 .container{

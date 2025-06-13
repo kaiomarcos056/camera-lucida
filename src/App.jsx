@@ -169,8 +169,12 @@ function App() {
 
       {(showMenu || !isMobile) && (
         <div className='containerMenu'>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          <br />
+          <div className='buttonImagem'>
+            <label htmlFor="upload"> Escolher imagem </label>
+          </div> 
+          
+          <input id="upload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
+          
           <label>
             Opacidade: {imageOpacity.toFixed(2)}
             <input
